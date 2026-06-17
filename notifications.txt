@@ -1,0 +1,3 @@
+{"app":"com.bcp.bo.wallet","title":"Recibiste un yapeo","text":"QR DE MARIO VICTOR MEDRANO MALDONADO te envió Bs. 6.40","lines":[],"timestamp":1781689814391,"notification_id":"b4213ac9b47d2e278c294d93660830fd","receivedAt":"2026-06-17T09:50:49.476Z"}
+{"app":"com.bancosol.altoke","title":"Recibiste un pago","text":"MARIO V te abonó Bs. 6.00","lines":[],"timestamp":1781689935613,"notification_id":"ef2ce1bbe213c63502ab7b0ed2be13e2","receivedAt":"2026-06-17T09:52:52.717Z"}
+{"app":"com.bcp.yape","title":"Test directo desde Bridger","text":"Prueba de conectividad al server","lines":[],"timestamp":1781690432273,"notification_id":"test_direct_1781690432273","receivedAt":"2026-06-17T10:00:33.063Z"}
