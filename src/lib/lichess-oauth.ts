@@ -46,6 +46,8 @@ export interface LichessAccount {
   id: string;
   username: string;
   email?: string;
+  tosViolation?: boolean;
+  count?: { all: number };
 }
 
 export function buildAuthUrl(challenge: string, state: string, redirectUri: string): string {

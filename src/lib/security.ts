@@ -3,7 +3,7 @@ import { verifyCsrfToken } from "./csrf";
 import { COOKIE_NAME } from "./auth";
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
-const CSRF_EXEMPT_PATHS = new Set(["/api/auth/logout"]);
+const CSRF_EXEMPT_PATHS = new Set(["/api/auth/logout", "/api/webhook-meta"]);
 
 export function parseAllowedOrigins(value: string) {
   return value

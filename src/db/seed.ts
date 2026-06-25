@@ -5,6 +5,10 @@ function dateFromNow(days: number): Date {
   return new Date(Date.now() + days * 86400 * 1000);
 }
 
+function ymd(year: number, month: number, day: number): string {
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 /**
  * Populate the database with initial seed data for development and testing.
  *
@@ -45,24 +49,30 @@ async function seed() {
 
   const userValues = [
     {
+      lichessId: "admin-lichess-001",
       email: "admin@peonveloz.com",
       firstName: "Admin",
       lastName: "PeonVeloz",
       role: "admin" as const,
       phone: "77777777",
+      countryName: "Bolivia",
+      stateName: "La Paz",
       createdAt: dateFromNow(-90),
       updatedAt: dateFromNow(-90),
     },
     ...MEMBER_NAMES.map(([first, last], i) => ({
+      lichessId: `lichess-${String(100 + i)}`,
       email: `${first.toLowerCase()}.${last.toLowerCase()}@peonveloz.com`,
       firstName: first,
       lastName: last,
       role: "member" as const,
       phone: `7${String(80000000 + i).slice(0, 8)}`,
       lichessUsername: `${first}${last}`,
-      isActive: i < 22, // 22 active, 8 inactive
-      birthDate: new Date(1970 + (i * 2) % 40, i % 12, (i * 3) % 28 + 1),
-      gender: i % 2 === 0 ? "male" : "female",
+      isActive: i < 22,
+      birthDate: ymd(1970 + (i * 2) % 40, (i % 12) + 1, (i * 3) % 28 + 1),
+      gender: (i % 2 === 0 ? "male" : "female") as "male" | "female",
+      countryName: i % 3 === 0 ? "Bolivia" : i % 3 === 1 ? "Perú" : "Argentina",
+      stateName: i % 3 === 0 ? "La Paz" : i % 3 === 1 ? "Lima" : "Buenos Aires",
       createdAt: dateFromNow(-120 + i * 2),
       updatedAt: dateFromNow(-30 - i * 3),
     })),
@@ -72,8 +82,6 @@ async function seed() {
     .insert(users)
     .values(userValues)
     .returning({ id: users.id, email: users.email });
-
-  const getUserByEmail = (email: string) => userRows.find((u) => u.email === email)!.id;
   console.log(`  ✔ users seeded (${userRows.length} rows)`);
 
   // Tournaments
@@ -82,12 +90,17 @@ async function seed() {
       name: "Intercolegial La Paz 2026",
       startTime: dateFromNow(30),
       location: "Coliseo Cerrado Julio Borelli, La Paz",
+      organizerName: "Admin PeonVeloz",
+      inscriptionPriceMin: 500,
+      inscriptionPriceMax: 700,
       systemOfPlay: "swiss",
-      category: "classical",
-      timeControl: "60+30",
-      numberOfRounds: 6,
-      createdBy: getUserByEmail("admin@peonveloz.com"),
-      updatedBy: getUserByEmail("admin@peonveloz.com"),
+      chessVariant: "standard",
+      clockTime: 3600,
+      clockIncrement: 30,
+      durationInMinutes: 80,
+      rounds: 6,
+      slug: "torneo-intercolegial",
+      isActive: true,
       createdAt: dateFromNow(-15),
       updatedAt: dateFromNow(-15),
     },
@@ -95,12 +108,17 @@ async function seed() {
       name: "Copa La Paz - Julio 2026",
       startTime: dateFromNow(3),
       location: "Club Bolivar, Sala Principal, La Paz",
+      organizerName: "Admin PeonVeloz",
+      inscriptionPriceMin: 500,
+      inscriptionPriceMax: 700,
       systemOfPlay: "swiss",
-      category: "classical",
-      timeControl: "60+30",
-      numberOfRounds: 7,
-      createdBy: getUserByEmail("admin@peonveloz.com"),
-      updatedBy: getUserByEmail("admin@peonveloz.com"),
+      chessVariant: "standard",
+      clockTime: 3600,
+      clockIncrement: 30,
+      durationInMinutes: 80,
+      rounds: 7,
+      slug: "torneo-copa-paz",
+      isActive: true,
       createdAt: dateFromNow(-25),
       updatedAt: dateFromNow(-25),
     },
@@ -108,12 +126,17 @@ async function seed() {
       name: "Torneo Relámpago Club Bolívar",
       startTime: dateFromNow(20),
       location: "Club Bolivar, Sala A",
+      organizerName: "Admin PeonVeloz",
+      inscriptionPriceMin: 300,
+      inscriptionPriceMax: 500,
       systemOfPlay: "swiss",
-      category: "blitz",
-      timeControl: "3+2",
-      numberOfRounds: 9,
-      createdBy: getUserByEmail("admin@peonveloz.com"),
-      updatedBy: getUserByEmail("admin@peonveloz.com"),
+      chessVariant: "standard",
+      clockTime: 180,
+      clockIncrement: 2,
+      durationInMinutes: 4,
+      rounds: 9,
+      slug: "torneo-relampago",
+      isActive: false,
       createdAt: dateFromNow(-30),
       updatedAt: dateFromNow(-30),
     },
@@ -126,7 +149,7 @@ async function seed() {
   console.log("  Tables populated:");
   console.log("    health_checks  →  3 rows");
   console.log("    users          →  31 rows (1 admin, 22 active + 8 inactive members)");
-  console.log("    tournaments    →  3 rows");
+  console.log("    tournaments    →  3 rows (2 activos, 1 inactivo)");
   console.log("");
 }
 

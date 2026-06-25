@@ -1,12 +1,13 @@
 import { Elysia, t } from "elysia";
 import { eq } from "drizzle-orm";
-import { Unauthorized, BadRequest } from "../lib/errors";
+import { Unauthorized, BadRequest, Conflict } from "../lib/errors";
 import { authPlugin, COOKIE_NAME } from "../lib/auth";
 import { generateCsrfToken } from "../lib/csrf";
-import { ok } from "../lib/response";
+import { ok, created } from "../lib/response";
+import { apiConfig } from "../lib/config";
 import { db } from "../db/client";
 import { users } from "../db/schema";
-import { DataResponse, UserRoleEnum, ErrorResponse } from "../lib/schemas";
+import { DataResponse, UserRoleEnum, ErrorResponse, validateBirthDate } from "../lib/schemas";
 import { getRedis } from "../lib/redis";
 import {
   generateCodeVerifier,
@@ -16,8 +17,8 @@ import {
   exchangeCode,
   getLichessAccount,
   deriveRedirectUri,
-  findOrCreateUser,
 } from "../lib/lichess-oauth";
+import { verifyToken, type RegisterToken } from "../lib/whatsapp/tokens";
 
 const TAG = ["Auth"];
 const OAUTH_TTL = 600;
@@ -48,7 +49,7 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
   // ── GET /auth/lichess/callback ────────────────────────────────
   .get(
     "/lichess/callback",
-    async ({ query, request, signIn }) => {
+    async ({ query, request }) => {
       const { code, state } = query as { code?: string; state?: string };
       if (!code || !state) throw new BadRequest("Missing code or state");
 
@@ -59,45 +60,76 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
 
       const { access_token } = await exchangeCode(code, codeVerifier, deriveRedirectUri(request));
       const account = await getLichessAccount(access_token);
-      const { userId, needsProfile } = await findOrCreateUser(account);
 
-      await signIn(userId);
+      // ── Redirect al frontend con datos de Lichess ──
+      // El frontend tiene /lichess-callback como puente BroadcastChannel hacia /register.
+      // No se crea usuario ni sesión acá — solo se entrega la identidad.
+      const games = account.count?.all ?? 0;
+      const params = new URLSearchParams({
+        lichessId: account.id,
+        lichessUsername: account.username,
+        email: account.email ?? "",
+        isClean: String(!account.tosViolation),
+        isEstablished: String(games >= 100),
+      });
 
-      const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:3000";
-      const target = needsProfile ? "/complete-profile" : "/";
-      return new Response(null, { status: 302, headers: { Location: `${frontendUrl}${target}` } });
+      return new Response(null, {
+        status: 302,
+        headers: { Location: `${apiConfig.publicUrl}/lichess-callback?${params}` },
+      });
     },
     {
       detail: { tags: TAG, summary: "Lichess OAuth — callback" },
     },
   )
 
-  // ── POST /auth/complete-profile ───────────────────────────────
+  // ── POST /auth/register ─────────────────────────────────────
   .post(
-    "/complete-profile",
-    async ({ body, currentUser }) => {
-      if (!currentUser) throw new Unauthorized();
-      await db.update(users)
-        .set({
-          firstName: body.firstName,
-          lastName: body.lastName,
-          phone: body.phone,
-          birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
-          gender: body.gender ?? undefined,
-        })
-        .where(eq(users.id, currentUser.id));
-      return ok({ message: "Profile updated" });
+    "/register",
+    async ({ body, set }) => {
+      const token = verifyToken<RegisterToken>(body.token, "register");
+      if (!token) throw new BadRequest("Invalid or expired register token");
+
+      // Validate birthDate
+      const dateError = validateBirthDate(body.birthDate);
+      if (dateError !== true) throw new BadRequest(dateError);
+
+      // Phone duplicate check
+      const [existing] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.phone, token.phone))
+        .limit(1);
+      if (existing) throw new Conflict("Phone already registered");
+
+      await db.insert(users).values({
+        lichessId: body.lichessId,
+        lichessUsername: body.lichessUsername,
+        email: body.email || null,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        stateName: body.stateName,
+        birthDate: body.birthDate,
+        phone: token.phone,
+        role: "member",
+        isActive: true,
+      });
+
+      return created({ message: "User registered" }, set);
     },
     {
       body: t.Object({
+        token: t.String(),
+        lichessId: t.String(),
+        lichessUsername: t.String(),
+        email: t.Optional(t.String()),
         firstName: t.String({ minLength: 1 }),
         lastName: t.String({ minLength: 1 }),
-        phone: t.String({ minLength: 1 }),
-        birthDate: t.Optional(t.String()),
-        gender: t.Optional(t.String()),
+        stateName: t.String({ minLength: 1 }),
+        birthDate: t.String(),
       }),
-      detail: { tags: TAG, summary: "Complete profile after first Lichess login" },
-      response: { 200: DataResponse(t.Object({ message: t.String() })), 401: ErrorResponse },
+      detail: { tags: TAG, summary: "Register user after Lichess OAuth" },
+      response: { 201: DataResponse(t.Object({ message: t.String() })) },
     },
   )
 

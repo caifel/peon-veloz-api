@@ -6,12 +6,12 @@
  *   .guard({ beforeHandle: requireAuth }, ...) // rejects 401 if no session
  *   .guard({ beforeHandle: requireRole("admin") }, ...)
  */
+import { and, eq, isNull } from "drizzle-orm";
 import { Elysia } from "elysia";
-import { eq, and, gt, isNull, sql } from "drizzle-orm";
 import { db } from "../db/client";
 import { sessions, users } from "../db/schema";
 import { apiConfig } from "./config";
-import { Unauthorized, Forbidden } from "./errors";
+import { Forbidden, Unauthorized } from "./errors";
 import { logger } from "./logger";
 
 // ── Config ──────────────────────────────────────────────────────

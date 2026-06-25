@@ -103,6 +103,19 @@ export const TournamentSummary = t.Object({
 });
 
 // ═══════════════════════════════════════════════════════════════
+// Validación de birthDate (YYYY-MM-DD, fecha real)
+// ═══════════════════════════════════════════════════════════════
+
+export function validateBirthDate(value: string): true | string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return "birthDate must be YYYY-MM-DD";
+  const d = new Date(value);
+  if (isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== value) {
+    return `${value} is not a valid date`;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Date normalization (Date → ISO string, null → null)
 // ═══════════════════════════════════════════════════════════════
 

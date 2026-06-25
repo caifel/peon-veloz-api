@@ -1,9 +1,118 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "684a9a27-58fd-4cdc-af63-2089f60324be",
+  "id": "6070d582-d984-4577-9969-65d58b98eba1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "donations": {
+      "name": "donations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "tournament_id": {
+          "name": "tournament_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'BOB'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "donations_user_id_idx": {
+          "name": "donations_user_id_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        },
+        "donations_tournament_id_idx": {
+          "name": "donations_tournament_id_idx",
+          "columns": [
+            "tournament_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "donations_tournament_id_tournaments_id_fk": {
+          "name": "donations_tournament_id_tournaments_id_fk",
+          "tableFrom": "donations",
+          "tableTo": "tournaments",
+          "columnsFrom": [
+            "tournament_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "donations_user_id_users_id_fk": {
+          "name": "donations_user_id_users_id_fk",
+          "tableFrom": "donations",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "health_checks": {
       "name": "health_checks",
       "columns": {
@@ -34,6 +143,213 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "inscriptions": {
+      "name": "inscriptions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "tournament_id": {
+          "name": "tournament_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'BOB'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "inscriptions_tournament_user_unique": {
+          "name": "inscriptions_tournament_user_unique",
+          "columns": [
+            "tournament_id",
+            "user_id"
+          ],
+          "isUnique": true
+        },
+        "inscriptions_user_id_idx": {
+          "name": "inscriptions_user_id_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "inscriptions_tournament_id_tournaments_id_fk": {
+          "name": "inscriptions_tournament_id_tournaments_id_fk",
+          "tableFrom": "inscriptions",
+          "tableTo": "tournaments",
+          "columnsFrom": [
+            "tournament_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inscriptions_user_id_users_id_fk": {
+          "name": "inscriptions_user_id_users_id_fk",
+          "tableFrom": "inscriptions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "prizes": {
+      "name": "prizes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "tournament_id": {
+          "name": "tournament_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "percentage": {
+          "name": "percentage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "prizes_tournament_id_idx": {
+          "name": "prizes_tournament_id_idx",
+          "columns": [
+            "tournament_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "prizes_tournament_id_tournaments_id_fk": {
+          "name": "prizes_tournament_id_tournaments_id_fk",
+          "tableFrom": "prizes",
+          "tableTo": "tournaments",
+          "columnsFrom": [
+            "tournament_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "prize_type_check": {
+          "name": "prize_type_check",
+          "value": "(\"prizes\".\"type\" = 'fixed' AND \"prizes\".\"amount\" IS NOT NULL AND \"prizes\".\"percentage\" IS NULL) OR (\"prizes\".\"type\" = 'percentage' AND \"prizes\".\"percentage\" IS NOT NULL AND \"prizes\".\"amount\" IS NULL)"
+        },
+        "rank_check": {
+          "name": "rank_check",
+          "value": "\"prizes\".\"rank\" > 0"
+        }
+      }
     },
     "sessions": {
       "name": "sessions",
@@ -140,6 +456,20 @@
           "notNull": false,
           "autoincrement": false
         },
+        "online_url": {
+          "name": "online_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "organizer_name": {
+          "name": "organizer_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "system_of_play": {
           "name": "system_of_play",
           "type": "text",
@@ -147,40 +477,94 @@
           "notNull": true,
           "autoincrement": false
         },
-        "category": {
-          "name": "category",
+        "chess_variant": {
+          "name": "chess_variant",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'standard'"
         },
-        "time_control": {
-          "name": "time_control",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "number_of_rounds": {
-          "name": "number_of_rounds",
+        "clock_time": {
+          "name": "clock_time",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "created_by": {
-          "name": "created_by",
+        "clock_increment": {
+          "name": "clock_increment",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "duration_in_minutes": {
+          "name": "duration_in_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "max_participants": {
+          "name": "max_participants",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "updated_by": {
-          "name": "updated_by",
+        "registration_deadline": {
+          "name": "registration_deadline",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "inscription_price_min": {
+          "name": "inscription_price_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "inscription_price_max": {
+          "name": "inscription_price_max",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "rounds": {
+          "name": "rounds",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -197,38 +581,74 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "tournaments_created_by_users_id_fk": {
-          "name": "tournaments_created_by_users_id_fk",
-          "tableFrom": "tournaments",
-          "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
+      "indexes": {
+        "tournaments_slug_unique": {
+          "name": "tournaments_slug_unique",
+          "columns": [
+            "slug"
           ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "isUnique": true
         },
-        "tournaments_updated_by_users_id_fk": {
-          "name": "tournaments_updated_by_users_id_fk",
-          "tableFrom": "tournaments",
-          "tableTo": "users",
-          "columnsFrom": [
-            "updated_by"
+        "tournaments_start_time_idx": {
+          "name": "tournaments_start_time_idx",
+          "columns": [
+            "start_time"
           ],
-          "columnsTo": [
-            "id"
+          "isUnique": false
+        },
+        "tournaments_system_of_play_idx": {
+          "name": "tournaments_system_of_play_idx",
+          "columns": [
+            "system_of_play"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "isUnique": false
+        },
+        "tournaments_active_start_idx": {
+          "name": "tournaments_active_start_idx",
+          "columns": [
+            "is_active",
+            "start_time"
+          ],
+          "isUnique": false
         }
       },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "rounds_check": {
+          "name": "rounds_check",
+          "value": "(\"tournaments\".\"system_of_play\" IN ('swiss','round-robin') AND \"tournaments\".\"rounds\" IS NOT NULL) OR (\"tournaments\".\"system_of_play\" NOT IN ('swiss','round-robin') AND \"tournaments\".\"rounds\" IS NULL)"
+        },
+        "price_range_check": {
+          "name": "price_range_check",
+          "value": "\"tournaments\".\"inscription_price_min\" <= \"tournaments\".\"inscription_price_max\""
+        },
+        "price_min_check": {
+          "name": "price_min_check",
+          "value": "\"tournaments\".\"inscription_price_min\" >= 0"
+        },
+        "clock_time_check": {
+          "name": "clock_time_check",
+          "value": "\"tournaments\".\"clock_time\" > 0"
+        },
+        "clock_increment_check": {
+          "name": "clock_increment_check",
+          "value": "\"tournaments\".\"clock_increment\" >= 0"
+        },
+        "duration_check": {
+          "name": "duration_check",
+          "value": "\"tournaments\".\"duration_in_minutes\" > 0"
+        },
+        "max_participants_check": {
+          "name": "max_participants_check",
+          "value": "\"tournaments\".\"max_participants\" IS NULL OR \"tournaments\".\"max_participants\" > 0"
+        },
+        "deadline_check": {
+          "name": "deadline_check",
+          "value": "\"tournaments\".\"registration_deadline\" IS NULL OR \"tournaments\".\"registration_deadline\" < \"tournaments\".\"start_time\""
+        }
+      }
     },
     "users": {
       "name": "users",
@@ -244,7 +664,7 @@
           "name": "lichess_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "lichess_username": {
@@ -277,7 +697,7 @@
         },
         "birth_date": {
           "name": "birth_date",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -296,8 +716,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "address": {
-          "name": "address",
+        "country_name": {
+          "name": "country_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "state_name": {
+          "name": "state_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -341,6 +768,13 @@
           ],
           "isUnique": true
         },
+        "users_phone_unique": {
+          "name": "users_phone_unique",
+          "columns": [
+            "phone"
+          ],
+          "isUnique": true
+        },
         "users_email_unique": {
           "name": "users_email_unique",
           "columns": [
@@ -352,7 +786,20 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "role_check": {
+          "name": "role_check",
+          "value": "\"users\".\"role\" IN ('admin','member')"
+        },
+        "gender_check": {
+          "name": "gender_check",
+          "value": "\"users\".\"gender\" IS NULL OR \"users\".\"gender\" IN ('male','female','other')"
+        },
+        "birth_date_check": {
+          "name": "birth_date_check",
+          "value": "\"users\".\"birth_date\" IS NULL OR \"users\".\"birth_date\" GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'"
+        }
+      }
     }
   },
   "views": {},

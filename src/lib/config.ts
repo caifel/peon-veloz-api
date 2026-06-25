@@ -55,7 +55,9 @@ export function loadApiRuntimeConfig() {
     host: required("HOST"),
     port: integer("PORT", required("PORT")),
     frontendUrl: originList("FRONTEND_URL", required("FRONTEND_URL")),
+    publicUrl: absoluteUrl("PUBLIC_URL", optional("PUBLIC_URL", "http://localhost:5173")),
     csrfSecret: required("CSRF_SECRET"),
+    tokenSigningKey: required("TOKEN_SIGNING_KEY"),
     redisUrl: optional("REDIS_URL", "redis://localhost:6379"),
     database: loadApiDatabaseConfig(),
   };

@@ -21,6 +21,8 @@ import { authRoutes } from "./routes/auth";
 import { usersRoutes } from "./routes/users";
 import { tournamentsRoutes } from "./routes/tournaments";
 import { pushNotificationRoutes } from "./routes/push-notification";
+import { webhookMetaRoutes } from "./routes/webhook-meta";
+import { tokenRoutes } from "./routes/token";
 
 const ALLOWED_ORIGINS = parseAllowedOrigins(apiConfig.frontendUrl);
 
@@ -134,17 +136,20 @@ export const app = new Elysia()
   //   GET  /api/auth/lichess, /api/auth/lichess/callback
   //   POST /api/auth/logout, /api/push-notification
   .onBeforeHandle({ as: "global" }, async ({ request, currentUser, path, cookie }) => {
-    assertAllowedMutationOrigin(request, ALLOWED_ORIGINS);
-    await assertCsrfToken(request, path, cookie as Record<string, { value?: string } | undefined>);
-
-    // Public paths — no auth required
+    // Public paths — no auth, no origin check, no CSRF required
     if (request.method === "GET") {
       if (path === "/" || path === "/health") return;
       if (path.startsWith("/swagger")) return;
       if (path === "/api/auth/lichess" || path === "/api/auth/lichess/callback") return;
     }
     if (path === "/api/auth/logout") return;
+    if (path === "/api/auth/register") return;
     if (path === "/api/push-notification") return;
+    if (path === "/api/webhook-meta") return;
+    if (path.startsWith("/api/register/") || path.startsWith("/api/checkout/")) return;
+
+    assertAllowedMutationOrigin(request, ALLOWED_ORIGINS);
+    await assertCsrfToken(request, path, cookie as Record<string, { value?: string } | undefined>);
 
     if (!currentUser) throw new Unauthorized();
   })
@@ -195,6 +200,8 @@ export const app = new Elysia()
   .use(usersRoutes)
   .use(tournamentsRoutes)
   .use(pushNotificationRoutes)
+  .use(webhookMetaRoutes)
+  .use(tokenRoutes)
 
   // ── Static files + SPA fallback (production only) ───────────────
   // In production the API serves the built Vue app from ../public.
